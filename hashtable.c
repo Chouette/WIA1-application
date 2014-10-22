@@ -51,9 +51,9 @@ HashTable* creer_dico(int tll)
  * @param mot : le mot à rechercher
  * @return 1 si mot se trouve dans dico, 0 sinon
  */
-int contient(HashTable* dico, Mot mot)
+int contient(HashTable* dico, char* mot)
 {
-	int index = hash(mot.mot) ;
+	int index = hash(mot) ;
 
 	return in_list(mot, dico->contenu[index]) ;
 }
@@ -68,7 +68,7 @@ HashTable* insere(Mot mot, HashTable* dico)
 {
 	int index ;
 
-	if(contient(dico, mot))
+	if(contient(dico, mot.mot))
 		return dico ;
 
 	index = hash(mot.mot) ;
@@ -89,5 +89,39 @@ void print_dico(HashTable* dico)
 	for(i = 0 ; i < dico->taille ; i++)
 	{
 		printf("entrée %d : ", i) ; print_listemot(dico->contenu[i]) ; printf("\n") ;
+	}
+}
+
+/*
+ * Récupère un mot de la hash table
+ * @param mot : le mot qu'on veut récupérer
+ * @param dico : la hash table dont on veut extraire le mot
+ * @return le mot voulu s'il se trouve dans la table, le mot vide sinon
+ */
+Mot get(char* mot, HashTable* dico)
+{
+	int index = hash(mot) ;
+
+	return list_get(mot, dico->contenu[index]) ;
+}
+
+/*
+ * Met à jour un mot du dictionnaire
+ * @param mot : le mot à jour
+ * @param dico : le dictionnaire à mettre à jour
+ */
+void set(Mot mot, HashTable* dico)
+{
+	int index = hash(mot.mot) ;
+	ListeMots* liste = dico->contenu[index] ;
+
+	while(liste->suivant != NULL)
+	{
+		if(strcmp(liste->element.mot, mot.mot) == 0)
+		{
+			liste->element = copie_mot(&(liste->element), &mot) ; 
+			break ;
+		}
+		liste = liste->suivant ;
 	}
 }

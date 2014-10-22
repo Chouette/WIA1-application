@@ -13,5 +13,6 @@ struct ListeMots
 ListeMots* add(const Mot elmnt, ListeMots* liste) ;
 ListeMots* init_listemots() ;
 void print_listemot(ListeMots* liste) ;
-int in_list(Mot mot, ListeMots* liste) ;
+int in_list(char* mot, ListeMots* liste) ;
+Mot list_get(char* mot, ListeMots* liste) ;
 #endif

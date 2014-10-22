@@ -31,7 +31,7 @@ char* lire_mot (FILE* fichier, char* mot)
 	char c = 'a' ;
 	int i = 0 ;
 
-	while( is_separateur(c = getc( fichier))) 
+	while(is_separateur(c = getc( fichier))) 
 	{
 		if(c == EOF)
 			return NULL ;
@@ -45,7 +45,6 @@ char* lire_mot (FILE* fichier, char* mot)
 		c = getc(fichier) ;
 		if(c == EOF)
 		{
-			printf("coucou\n") ;
 			return NULL ;
 		}
 	}

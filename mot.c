@@ -20,7 +20,7 @@ Mot init_mot()
 {
 	Mot mot ;
 	mot.mot = (char*) malloc(TAILLE_MOT * sizeof(char)) ;
-	mot.freq_app = mot.occurences = mot.score = 0 ;
+	mot.freq_app = mot.occurences = mot.score = mot.dejaVu = 0  ;
 	return mot ;
 }
 

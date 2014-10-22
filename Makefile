@@ -1,5 +1,11 @@
 test: test.o files.o mot.o liste.o hashtable.o
 	gcc -o test test.o files.o mot.o liste.o hashtable.o -lm
+appli: app.o files.o mot.o liste.o hashtable.o
+	gcc -o appli app.o files.o mot.o liste.o hashtable.o -lm
+
+
+app.o: app.c files.h mot.h hashtable.h
+	gcc -c app.c -o app.o
 
 hashtable.o : hashtable.c hashtable.h 
 	gcc -c hashtable.c -o hashtable.o

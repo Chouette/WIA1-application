@@ -9,6 +9,7 @@ struct Mot
 	char* mot ;
 	double freq_app ;
 	int occurences ;
+	int dejaVu ;
 	double score ; //score = freq_app * occurences
 } ;
 

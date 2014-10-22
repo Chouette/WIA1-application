@@ -11,7 +11,7 @@ int main(int argc, char** argv)
 {
 	FILE* fileTest = NULL ;
 	char* mot ;
-	Mot word, trololo ;
+	Mot word ;
 	ListeMots* liste ;
 	HashTable* dico ;
 
@@ -114,9 +114,7 @@ int main(int argc, char** argv)
 	update_score(&word) ;
 	dico = insere(word, dico) ;
 	print_dico(dico) ;
-	trololo = init_mot() ;
-	trololo.mot = strcpy(trololo.mot, "trololo") ;
-	if(contient(dico,trololo))
+	if(contient(dico,"trololo"))
 			printf("trololol\n") ;
 	printf("\n\n") ;
 
