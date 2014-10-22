@@ -84,6 +84,7 @@ Mot list_get(char* mot, ListeMots* liste)
 		{
 			return liste->element ;
 		}
+		liste = liste->suivant ;
 	}
 
 	return res ;

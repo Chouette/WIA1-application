@@ -39,5 +39,6 @@ Mot copie_mot(Mot* dest, const Mot* src)
 	dest->freq_app = src->freq_app ;
 	dest->occurences = src->occurences ;
 	dest->score = src->score ;
+	dest->dejaVu = src->dejaVu ;
 	return *dest ;
 }

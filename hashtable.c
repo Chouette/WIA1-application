@@ -53,8 +53,12 @@ HashTable* creer_dico(int tll)
  */
 int contient(HashTable* dico, char* mot)
 {
-	int index = hash(mot) ;
+	int index = 0 ;
 
+	if(mot == NULL)
+		return 0 ;
+
+	index = hash(mot) ;
 	return in_list(mot, dico->contenu[index]) ;
 }
 

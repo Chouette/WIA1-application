@@ -2,7 +2,7 @@
 #define HASHTABLE_H
 
 #include "liste.h"
-#define TAILLE 5
+#define TAILLE 92
 
 typedef struct HashTable HashTable ;
 struct HashTable

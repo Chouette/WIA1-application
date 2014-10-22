@@ -1,8 +1,12 @@
 #include "files.h"
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
-const static char separateurs[NB_SEP] = {' ', '\t', '\n', ',', ';', '.', '?', '!', ':', EOF} ;
+
+#define DEBUG 0
+
+const static char separateurs[NB_SEP] = {' ', '\t', '\n', ',', ';', '.', '?', '!', ':', '\'', '(', ')', EOF} ;
 /*
  * Indique si un caractère est un séparateur de mots
  * @param c : le caractère à tester
@@ -33,14 +37,25 @@ char* lire_mot (FILE* fichier, char* mot)
 
 	while(is_separateur(c = getc( fichier))) 
 	{
+#if DEBUG
+		printf("while(is_separateur(c = getc( fichier)))\n") ; 
+#endif
 		if(c == EOF)
+		{
+#if DEBUG
+			printf("\tif(c == EOF)\n") ;
+#endif
 			return NULL ;
+		}
 	}
 	fseek (fichier, -1, SEEK_CUR) ;
 
 	c = getc(fichier) ;
 	while (!is_separateur(c))
 	{
+#if DEBUG
+		printf("while (!is_separateur(c))\n{\n") ;
+#endif
 		mot[i++] = c ;
 		c = getc(fichier) ;
 		if(c == EOF)
@@ -50,5 +65,26 @@ char* lire_mot (FILE* fichier, char* mot)
 	}
 	mot[i] = '\0' ;
 	return mot ;
+}
+
+char* to_lower(char* mot)
+{
+	int i = 0 ;
+
+	if(!mot)
+	{
+		return mot ;
+	}
+	else
+	{
+		char* c = malloc(strlen(mot) + 1);
+		while(*mot != '\0')
+		{
+			c[i++] = tolower(*mot) ;
+			mot++ ;
+		}
+		c[i] = '\0' ;
+		return c ;
+	}
 }
 

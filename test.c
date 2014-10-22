@@ -120,6 +120,17 @@ int main(int argc, char** argv)
 
 	printf("mot = %s, hash(mot) = %d\n", word.mot, hash(word.mot)) ;
 	fclose(fileTest) ;
+	printf("\n\n\n") ;
+
+
+	printf("******************\n"
+		   "*TEST ignore case*\n"
+		   "******************\n") ;
+	{
+		char* s = "couCOU" ;
+
+		printf("%s -> %s\n", s, to_lower(s)) ;
+	}
 	return 0 ;
 }
 
