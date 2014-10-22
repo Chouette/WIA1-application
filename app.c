@@ -162,6 +162,12 @@ int main(int argc, char** argv)
 	printf("\nObtenu à partir de la hash table suivante :\n") ;
 	print_dico(dico) ;
 
+	printf("\n********************\n"
+		     "*generation du XML *\n"
+		     "********************\n");
+	generate_xml(winners, NB_WINNERS) ;
+	printf("fichier enregistré\n") ;
+
 	return 0 ;
 }
 

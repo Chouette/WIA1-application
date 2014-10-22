@@ -131,6 +131,24 @@ int main(int argc, char** argv)
 
 		printf("%s -> %s\n", s, to_lower(s)) ;
 	}
+	printf("\n\n\n") ;
+
+
+	printf("*******************\n"
+		   "*TEST generate_xml*\n"
+		   "*******************\n") ;
+	{
+		Mot winners[10] ;
+		int i = 0 ;
+
+		for(i = 0 ; i < 10 ; i++)
+		{
+			winners[i] = init_mot() ;
+			winners[i].mot = "coucou" ;
+		}
+
+		generate_xml(winners, 10) ;
+	}
 	return 0 ;
 }
 

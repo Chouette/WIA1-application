@@ -1,8 +1,8 @@
 #include "files.h"
+#include "mot.h"
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
 
 #define DEBUG 0
 
@@ -67,6 +67,11 @@ char* lire_mot (FILE* fichier, char* mot)
 	return mot ;
 }
 
+/*
+ * Met un mot en minuscules
+ * @param mot : le mot à mettre en minuscules
+ * @return le mot en minuscule
+ */
 char* to_lower(char* mot)
 {
 	int i = 0 ;
@@ -78,6 +83,7 @@ char* to_lower(char* mot)
 	else
 	{
 		char* c = malloc(strlen(mot) + 1);
+
 		while(*mot != '\0')
 		{
 			c[i++] = tolower(*mot) ;
@@ -87,4 +93,36 @@ char* to_lower(char* mot)
 		return c ;
 	}
 }
+
+/*
+ * Génère du code XML pour ThemeEditor
+ * @param winners[] : tableau des mots à mettre dans le fichier XML
+ * @param nbElements : taille de winners[]
+ * @return 1 si erreur, 0 sinon
+ */
+int generate_xml(Mot winners[], int nbElements)
+{
+	FILE* words = NULL ;
+	int i = 0, ret = 1 ;
+	
+	words = fopen("words.xml","w") ;
+
+	if(words == NULL)
+	{
+		fprintf(stderr, "Impossible d'ouvrir le fichier words\n") ;
+		return 1 ;
+	}
+
+	for(i = 0 ; i <  nbElements ; i++)
+	{
+		if(fputs("<Word>", words) == EOF) return 1 ;
+		if(fputs(winners[i].mot, words)== EOF) return 1 ;
+		if(fputs("</Word>\n", words) == EOF) return 1 ;
+	}
+
+	return 0 ;
+
+
+}
+
 
