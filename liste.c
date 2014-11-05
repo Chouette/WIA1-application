@@ -58,6 +58,12 @@ ListeMots* add(const Mot elmnt, ListeMots* liste)
  */
 void print_listemot(ListeMots* liste)
 {
+	if(liste == NULL)
+	{
+		printf("liste inexistante\n") ;
+		exit(-1) ;
+	}
+
 	while(liste->suivant != NULL)
 	{
 		print_mot(liste->element) ;

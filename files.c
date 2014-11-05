@@ -105,18 +105,19 @@ char* to_lower(char* mot)
  * Génère du code XML pour ThemeEditor
  * @param winners[] : tableau des mots à mettre dans le fichier XML
  * @param nbElements : taille de winners[]
+ * @param output : le nom du fichier à générer
  * @return 1 si erreur, 0 sinon
  */
-int generate_xml(Mot winners[], int nbElements)
+int generate_xml(Mot winners[], int nbElements, char* output)
 {
 	FILE* words = NULL ;
 	int i = 0, ret = 1 ;
 	
-	words = fopen("words.xml","w") ;
+	words = fopen(output,"w") ;
 
 	if(words == NULL)
 	{
-		fprintf(stderr, "Impossible d'ouvrir le fichier words\n") ;
+		fprintf(stderr, "Impossible d'ouvrir le fichier %s\n", output) ;
 		return 1 ;
 	}
 
@@ -128,8 +129,6 @@ int generate_xml(Mot winners[], int nbElements)
 	}
 
 	return 0 ;
-
-
 }
 
 

@@ -10,7 +10,10 @@
 
 #define NB_WINNERS 10
 #define DEBUG 0
-#define VERBOSE 0
+#define VERBOSE 1
+
+int nb_winners = 10 ;
+char* output_file = NULL ;
 
 /*
  * Compte le nombre de fichiers réguliers d'un dossier
@@ -65,6 +68,78 @@ int count_reg_files(const char* path, DIR* dir)
 }
 
 /*
+ * Traite les différentes options du programme
+ * @param argc : le argc de main
+ * @param argv : le argv de main
+ * @return nombre d'arguments traités
+ */
+int parse_options(const int argc, char** argv)
+{
+	int i ;
+	int c = 0 ;
+	char* p ;
+
+	for(i = 1 ; i < argc ; )
+	{
+		p = argv[i] ;
+
+		if(p[0] == '-')
+		{
+			p++ ;
+
+			switch(*p)
+			{
+				case 'h':
+					printf("Syntaxe :\nappli -h\n"
+						   "appli [-n nb_winners] <dossier_theme> [dossier_theme...]\n") ;
+					exit(0) ;
+					break ;
+				case 'n':
+					if(i+1 == argc)
+					{
+						fprintf(stderr, "missing argument for option -n\n") ;
+						exit(-1) ;
+					}
+					p = argv[i+1] ;
+					nb_winners = atoi(p) ;
+					c += 2 ;
+					i += 2 ;
+					break ;
+				case 'o' :
+					if(i+1 == argc)
+					{
+						fprintf(stderr, "missing argument for option -n\n") ;
+						exit(-1) ;
+					}
+
+					p = argv[i+1] ;
+					output_file = calloc(strlen(p) + 1, sizeof(char) ) ;
+					
+					if(output_file == NULL)
+					{
+						perror("parse_options : calloc de output_file ") ;
+					}
+					else
+					{
+						output_file = strcpy(output_file, p) ;
+					}
+
+					c += 2 ;
+					i += 2 ;
+					break ;
+				default:
+					fprintf(stderr, "invalid argument -%c\n", *p) ;
+					exit(-1) ;
+					break ;
+			}
+		}
+		else 
+			return c ;
+	}
+	return c ;
+}
+
+/*
  * Le programme génère une liste de mots supposés être représentatifs d'un
  * thème donné. Pour cela il prend en argument une liste de dossiers (au moins
  * 2),
@@ -75,13 +150,22 @@ int count_reg_files(const char* path, DIR* dir)
 int main(int argc, char** argv)
 {
 	int i = 0, minIndex = 0, nouveauxMots = 0, maj = 0, j = 1 ;
-	int count = 0 ;
+	int count = 0, start ;
 	FILE* fichierEnCours = NULL ;
 	DIR* repTheme = NULL ;
 	struct dirent* entite = NULL ;
 	struct stat st ;
 	HashTable* dico = NULL ;
-	Mot winners[NB_WINNERS] ;
+	Mot *winners ;
+
+	start = parse_options(argc, argv) ;
+	winners = calloc(nb_winners, sizeof(Mot)) ;
+
+	if(winners == NULL)
+	{
+		perror("main : calloc ") ;
+		exit(errno) ;
+	}
 	
 
 #if VERBOSE
@@ -90,17 +174,17 @@ int main(int argc, char** argv)
 	dico = creer_dico(TAILLE) ;
 
 	/* pour chaque dossier de thème */
-	for(i = 1 ; i < argc ; i++)
+	for(i = start + 1 ; i < argc ; i++)
 	{
 		printf("\n\n\n") ;
 		printf("Thème %d sur %d : %s\n"
-			   "-----------------------\n", i, argc -1, argv[i]) ;
+			   "-----------------------\n", i - start, argc -1, argv[i]) ;
 
 		if(stat(argv[i], &st) == -1)
 		{
 			fprintf(stderr,"%s\n", argv[i]) ;
 			perror("stat") ;
-			exit(errno) ;
+			continue ;
 		}
 
 		if(!S_ISDIR(st.st_mode))
@@ -194,7 +278,7 @@ int main(int argc, char** argv)
 				 * dictionnaire */
 				if(!contient(dico, motLu))
 				{
-					if(i == 1)
+					if(i == start + 1)
 					{
 						Mot motAStocker = init_mot() ;
 
@@ -240,7 +324,7 @@ int main(int argc, char** argv)
 #if DEBUG
 					printf("get terminé\n") ;
 #endif
-					if(i == 1)
+					if(i == start + 1)
 						motStocke.occurences++ ;
 
 					/*
@@ -253,7 +337,7 @@ int main(int argc, char** argv)
 #endif
 						motStocke.dejaVu = j ;
 
-						if(i == 1)
+						if(i == start + 1)
 							motStocke.freq_app += 1.0 / count ;
 
 						//printf("%s.freq_app = %f\n", motLu, motStocke.freq_app) ;
@@ -310,12 +394,16 @@ int main(int argc, char** argv)
 	 */
 
 	printf("\tinitialisation du tableau\n") ;
-	for(i = 0 ; i < NB_WINNERS ; i++)
+
+	for(i = 0 ; i < nb_winners ; i++)
 		winners[i] = init_mot() ;
 
+	printf("\tparcours du dictionnaire\n");
 	for(i = 0 ; i < TAILLE ; i++)
 	{
-		ListeMots* liste = dico->contenu[i] ;
+		ListeMots* liste ;
+
+		liste = dico->contenu[i] ;
 		
 //		printf("\tanalyse de la page %d du dictionnaire\n", i) ;
 		while (liste->suivant != NULL)
@@ -326,7 +414,7 @@ int main(int argc, char** argv)
 				winners[minIndex] = liste->element ;
 				
 				/* recalculer l'index du minimum du tableau winners */
-				for(j = 0 ; j < NB_WINNERS ; j++)
+				for(j = 0 ; j < nb_winners ; j++)
 				{
 					if(winners[j].score < winners[minIndex].score)
 						minIndex = j ;
@@ -339,7 +427,7 @@ int main(int argc, char** argv)
 	printf("\n*************\n"
 		     "*Résultat : *\n"
 		     "*************\n");
-	for(i = 0 ; i < NB_WINNERS ; i++)
+	for(i = 0 ; i < nb_winners ; i++)
 	{
 		if(winners[i].mot[0] != '\0')
 		{
@@ -355,8 +443,10 @@ int main(int argc, char** argv)
 	printf("\n********************\n"
 		     "*generation du XML *\n"
 		     "********************\n");
-	generate_xml(winners, NB_WINNERS) ;
-	printf("fichier enregistré\n") ;
+	if(generate_xml(winners, nb_winners, (output_file == NULL ? "words.xml" : output_file)) == 0)
+		printf("fichier enregistré\n") ;
+	else
+		printf("erreur lors de la génération du fichier %s\n",output_file) ;
 
 	return 0 ;
 }

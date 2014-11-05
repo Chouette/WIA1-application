@@ -7,6 +7,47 @@
 #include "hashtable.h"
 #define NEWLINE() printf("\n") ;
 
+
+int nb_winners = 10 ;
+
+void parse_arguments(const int argc, char** argv)
+{
+	int i ;
+	char* p ;
+
+	for(i = 1 ; i < argc ; i++)
+	{
+		p = argv[i] ;
+		if(p[0] == '-')
+		{
+			p++ ;
+
+			switch(*p)
+			{
+				case 'h':
+					printf("Syntaxe : \nappli -h\n"
+						   "appli [-n nb_winners] <dossier_theme> [dossier_theme...]\n") ;
+					exit(0) ;
+					break ;
+				case 'n':
+					if(i+1 == argc)
+					{
+						fprintf(stderr, "missing argument for option -n\n") ;
+						exit(-1) ;
+					}
+					p = argv[i+1] ;
+					nb_winners = atoi(p) ;
+					break ;
+				default:
+					fprintf(stderr, "invalid argument -%c\n", *p) ;
+					exit(-1) ;
+					break ;
+			}
+			printf("%s\n", p) ;
+		}
+	}
+}
+
 int main(int argc, char** argv)
 {
 	FILE* fileTest = NULL ;
@@ -131,9 +172,8 @@ int main(int argc, char** argv)
 
 		printf("%s -> %s\n", s, to_lower(s)) ;
 	}
+
 	printf("\n\n\n") ;
-
-
 	printf("*******************\n"
 		   "*TEST generate_xml*\n"
 		   "*******************\n") ;
@@ -148,6 +188,15 @@ int main(int argc, char** argv)
 		}
 
 		generate_xml(winners, 10) ;
+	}
+
+	printf("\n\n\n") ;
+	printf("*******************\n"
+		   "*TEST parse_arguments*\n"
+		   "*******************\n") ;
+	{
+		parse_arguments(argc, argv) ;
+		printf("nb_winners = %d\n", nb_winners) ;
 	}
 	return 0 ;
 }

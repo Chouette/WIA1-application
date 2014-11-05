@@ -161,6 +161,12 @@ void print_dico(HashTable* dico)
 {
 	int i ;
 
+	if(dico == NULL)
+	{
+		fprintf(stderr, "dictionnaire inexistant\n") ;
+		exit(-1) ;
+	}
+
 	for(i = 0 ; i < dico->taille ; i++)
 	{
 		if(dico->contenu[i]->element.mot[0] != '\0')
