@@ -8,8 +8,10 @@ struct Mot
 {
 	char* mot ;
 	double freq_app ;
+	double freq_thematique ;
 	int occurences ;
 	int dejaVu ;
+	int inTheme ;
 	double score ; //score = freq_app * occurences
 } ;
 

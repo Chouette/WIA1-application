@@ -18,38 +18,44 @@
  * @param dir : la structure représentant le dossier
  * @return le nombre de fichiers réguliers présents dans le dossier
  */
-int count_reg_files(char* path, DIR* dir)
+int count_reg_files(const char* path, DIR* dir)
 {
 	struct stat st ;
 	struct dirent* entite ;
 	int count = 0 ;
 	long pos ;
 	char* copie = malloc((strlen(path) + 1) * sizeof(char)) ;
+	char* racine = malloc((strlen(path) + 1) * sizeof(char)) ;
 
-	if( copie == NULL)
+	if( copie == NULL || racine == NULL)
 	{
 		perror("malloc") ;
 		exit(errno) ;
 	}
 
 	copie = strcpy( copie, path) ;
+	racine = strcpy( racine, path) ;
+
 
 	pos = telldir(dir) ;
 
 	while( (entite = readdir(dir)) != NULL)
 	{
-		path = strcat(path, "/") ;
-		path = strcat(path, entite->d_name) ;
+		copie = strcat(copie, "/") ;
+		copie = strcat(copie, entite->d_name) ;
 		
-		if( stat(path, &st) == -1)
+		if( stat(copie, &st) == -1)
 		{
 			perror(path) ;
 			exit(errno) ;
 		}
 
 		if( S_ISREG(st.st_mode) )
+		{
 			count++ ;
-		path = strcpy( path, copie) ;
+		}
+
+		copie = strcpy( copie, racine) ;
 	}
 
 	
@@ -69,7 +75,7 @@ int count_reg_files(char* path, DIR* dir)
 int main(int argc, char** argv)
 {
 	int i = 0, minIndex = 0, nouveauxMots = 0, maj = 0, j = 1 ;
-	int count ;
+	int count = 0 ;
 	FILE* fichierEnCours = NULL ;
 	DIR* repTheme = NULL ;
 	struct dirent* entite = NULL ;
@@ -78,6 +84,9 @@ int main(int argc, char** argv)
 	Mot winners[NB_WINNERS] ;
 	
 
+#if VERBOSE
+	printf("Création du dictionnaire\n") ;
+#endif
 	dico = creer_dico(TAILLE) ;
 
 	/* pour chaque dossier de thème */
@@ -85,6 +94,7 @@ int main(int argc, char** argv)
 	{
 		if(stat(argv[i], &st) == -1)
 		{
+			fprintf(stderr,"%s\n", argv[i]) ;
 			perror("stat") ;
 			exit(errno) ;
 		}
@@ -180,6 +190,7 @@ int main(int argc, char** argv)
 				if(!contient(dico, motLu))
 				{
 					Mot motAStocker = init_mot() ;
+
 					nouveauxMots++ ;
 #if DEBUG
 					printf("if(!contient(dico, motLu))\n{\n");
@@ -193,7 +204,9 @@ int main(int argc, char** argv)
 #endif
 					motAStocker.mot = strcpy(motAStocker.mot, motLu) ;
 					motAStocker.occurences = 1 ;
-					motAStocker.freq_app = 1.0/count ;
+					motAStocker.freq_app = 1.0 / count ;
+					motAStocker.freq_thematique = 1.0 / (argc-1) ;
+					//printf("%s.freq_app = %f\n", motLu, motAStocker.freq_app) ;
 					update_score(&motAStocker) ;
 					motAStocker.dejaVu = j ;
 #if VERBOSE
@@ -218,13 +231,31 @@ int main(int argc, char** argv)
 #endif
 					motStocke.occurences++ ;
 
+					/*
+					 * si on a pas encore rencontré le mot dans le texte
+					 */
 					if(motStocke.dejaVu != j)
 					{
 #if DEBUG
 						printf("if(motStocke.dejaVu != i)\n{\n") ;
 #endif
 						motStocke.dejaVu = j ;
-						motStocke.freq_app += 1.0 / count ;
+
+						/* 
+						 * freq_app est la fréquence d'apparition du mot
+						 * vis-à-vis du thème qu'on considère, soit celui de
+						 * argv[1]. D'où le test 
+						 */
+						if(i == 1)
+							motStocke.freq_app += 1.0 / count ;
+
+						//printf("%s.freq_app = %f\n", motLu, motStocke.freq_app) ;
+					}
+
+					if( motStocke.inTheme != i)
+					{
+						motStocke.inTheme = i ;
+						motStocke.freq_thematique += 1.0 / (argc-1) ;
 					}
 
 					update_score(&motStocke) ;
@@ -245,6 +276,7 @@ int main(int argc, char** argv)
 			printf("fin while(motLu != NULL)\n") ;
 #endif
 		}
+		count = 0 ;
 	}//fin for()
 
 	printf("\n***********************\n"
@@ -299,7 +331,7 @@ int main(int argc, char** argv)
 		printf("\t- ") ; print_mot(winners[i]) ; printf("\n") ;
 	}
 
-#if DEBUG
+#if 1
 	printf("\nObtenu à partir de la hash table suivante :\n") ;
 	print_dico(dico) ;
 #endif

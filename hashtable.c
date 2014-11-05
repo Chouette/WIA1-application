@@ -1,4 +1,5 @@
 #include "hashtable.h"
+#include <errno.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,10 +38,32 @@ HashTable* creer_dico(int tll)
 	HashTable* dico ;
 	int i ;
 
+#if DEBUG
+	printf("creer_dico : malloc de dico\n") ;
+#endif
 	dico = malloc(sizeof(HashTable)) ;
+
+	if(dico == NULL)
+	{
+		perror("creer_dico : malloc de dico ") ;
+		exit(errno) ;
+	}
+	
 	dico->taille = tll ;
+#if DEBUG
+	printf("creer_dico : malloc de dico->contenu\n") ;
+#endif
 	dico->contenu = malloc(tll * sizeof(ListeMots*)) ;
 
+	if(dico->contenu == NULL)
+	{
+		perror("creer_dico : malloc de dico->contenu ") ;
+		exit(errno) ;
+	}
+
+#if DEBUG
+	printf("creer_dico : remplissage de dico->contenu\n") ;
+#endif
 	for(i = 0 ; i < tll ; i++)
 	{
 		dico->contenu[i] = init_listemots() ;
