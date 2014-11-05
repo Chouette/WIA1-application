@@ -3,12 +3,9 @@
 #include <stdio.h>
 #include <errno.h>
 
-#define VERBOSE 0
-#define DEBUG 0
-
 /*
  * Crée une liste de Mot par défaut
- * @return une liste de Mot vide
+ * @return une liste contenant juste le mot vide
  */
 ListeMots* init_listemots()
 {
@@ -22,17 +19,8 @@ ListeMots* init_listemots()
 		exit(errno) ;
 	}
 
-#if DEBUG
-	printf("init_listemots : initialisation de liste->element\n") ;
-#endif
 	liste->element = init_mot() ;
 	liste->suivant = NULL ;
-
-#if DEBUG
-	if(liste == NULL)
-		printf("init_listemots : something wrong happened\n") ;
-#endif
-
 
 	return liste ;
 }
@@ -46,7 +34,8 @@ ListeMots* init_listemots()
 ListeMots* add(const Mot elmnt, ListeMots* liste)
 {
 	ListeMots* tmp = init_listemots() ;
-	tmp->element =  copie_mot(&(tmp->element), &elmnt) ;
+
+	tmp->element = copie_mot( &(tmp->element), &elmnt) ;
 	tmp->suivant = liste ;
 
 	return tmp ;
@@ -84,16 +73,9 @@ int in_list(char* mot, ListeMots* liste)
 {
 	ListeMots* tmp ;
 
-#if DEBUG
-	printf("in_list : initialisation de tmp\n") ;
-#endif
 	tmp = init_listemots() ;
-
 	tmp = liste ;
 
-#if DEBUG
-	printf("in_list : début de la recherche\n") ;
-#endif
 	while(tmp->suivant != NULL)
 	{
 		if(strcmp(mot, (tmp->element).mot) == 0)
@@ -101,10 +83,6 @@ int in_list(char* mot, ListeMots* liste)
 
 		tmp = tmp->suivant ;
 	}
-
-#if DEBUG
-	printf("in_list : mot non trouvé\n") ;
-#endif
 
 	return 0 ;
 }
@@ -125,6 +103,7 @@ Mot list_get(char* mot, ListeMots* liste)
 		{
 			return liste->element ;
 		}
+
 		liste = liste->suivant ;
 	}
 

@@ -4,8 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#define DEBUG 0
-
+/* Liste des caractères considérés comme séparateurs de mots */
 const static char separateurs[NB_SEP] = {
 	'+'	,	'='		,	' '	,	'\t'	,	'\n', 
 	','	,	';'		,	'.'	,	'?'		,	'!', 
@@ -14,6 +13,7 @@ const static char separateurs[NB_SEP] = {
 	'#'	,	'{'		,	'['	,	'-'		,	'|',
 	'_'	,	'@'		,	']'	,	'}'		,	'<',
 	'>'} ;
+
 /*
  * Indique si un caractère est un séparateur de mots
  * @param c : le caractère à tester
@@ -42,34 +42,30 @@ char* lire_mot (FILE* fichier, char* mot)
 	char c = 'a' ;
 	int i = 0 ;
 
+	/* Ignorer tous les séparateurs qu'il y a entre 2 mots */
 	while(is_separateur(c = getc( fichier))) 
 	{
-#if DEBUG
-		printf("while(is_separateur(c = getc( fichier)))\n") ; 
-#endif
 		if(c == EOF)
 		{
-#if DEBUG
-			printf("\tif(c == EOF)\n") ;
-#endif
 			return NULL ;
 		}
 	}
-	fseek (fichier, -1, SEEK_CUR) ;
 
+	fseek (fichier, -1, SEEK_CUR) ;
 	c = getc(fichier) ;
+
+	/* Ajouter un à un les caractères du mot dans mot */
 	while (!is_separateur(c))
 	{
-#if DEBUG
-		printf("while (!is_separateur(c))\n{\n") ;
-#endif
 		mot[i++] = c ;
 		c = getc(fichier) ;
+
 		if(c == EOF)
 		{
 			return NULL ;
 		}
 	}
+
 	mot[i] = '\0' ;
 	return mot ;
 }
@@ -123,9 +119,17 @@ int generate_xml(Mot winners[], int nbElements, char* output)
 
 	for(i = 0 ; i <  nbElements ; i++)
 	{
-		if(fputs("<Word>", words) == EOF) return 1 ;
-		if(fputs(winners[i].mot, words)== EOF) return 1 ;
-		if(fputs("</Word>\n", words) == EOF) return 1 ;
+		if(winners[i].mot[0] != '\0')
+		{
+			if(fputs("<Word>", words) == EOF) 
+				return 1 ;
+
+			if(fputs(winners[i].mot, words)== EOF) 
+				return 1 ;
+
+			if(fputs("</Word>\n", words) == EOF) 
+				return 1 ;
+		}
 	}
 
 	return 0 ;

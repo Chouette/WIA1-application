@@ -16,7 +16,6 @@ HashTable* creer_dico(int tll) ;
 int contient(HashTable* dico, char* mot) ;
 HashTable* insere(Mot mot, HashTable* dico) ;
 void print_dico(HashTable* dico) ;
-//HashTable redimensionner(Hashtable dico) ;
 Mot get(char* mot, HashTable* dico) ;
 void set(Mot mot, HashTable* dico) ;
 

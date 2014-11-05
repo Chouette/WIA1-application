@@ -23,5 +23,5 @@ liste.o: liste.c liste.h
 	gcc -c liste.c -o liste.o
 
 clean:
-	rm *.o
+	rm *.o appli test
 	

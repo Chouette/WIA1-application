@@ -5,8 +5,6 @@
 #include <string.h>
 #include <math.h>
 
-#define VERBOSE 0
-
 /*
  * Affiche les composantes du mot
  * @param mot : le mot qu'on veut afficher
@@ -24,9 +22,6 @@ Mot init_mot()
 {
 	Mot mot ;
 
-#if VERBOSE
-	printf("init_mot : création d'un mot vide\n") ;
-#endif
 	mot.mot = malloc(TAILLE_MOT * sizeof(char)) ;
 
 	if(mot.mot == NULL)
@@ -34,32 +29,27 @@ Mot init_mot()
 		perror("init_mot") ;
 		exit(errno) ;
 	}
-	mot.mot[0] = '\0' ;
 
+	mot.mot[0] = '\0' ;
 	mot.freq_app = mot.occurences = mot.dejaVu = mot.freq_thematique = mot.inTheme = 0  ;
 	mot.score = 0 ;
-#if VERBOSE
-	printf("init_mot : mot créé :") ;
-	print_mot(mot) ;
-	printf("\n") ;
-#endif
+
 	return mot ;
 }
 
 /*
  * Met à jour le score du mot
  * @param mot : le mot dont on souhaite mettre le score à jour
+ * @param singleMode : indique de prendre en compte ou non la fréquence
+ * thématique dans le calcul du score
  */
 void update_score (Mot* mot, int singleMode)
 {
-	if(!singleMode)
-		mot->score = -log(mot->freq_thematique) * mot->freq_app * mot->occurences ;
-	else
-		mot->score = mot->freq_app * mot->occurences ;
+	mot->score = (!singleMode ? -log(mot->freq_thematique) * mot->freq_app * mot->occurences : mot->freq_app * mot->occurences) ;
 }
 
 /*
- * Copie un mot dans un autre
+ * Copie un mot dans un autre, champ par champ
  * @param dest : la copie
  * @param src : l'original à copier
  * @return la copie
