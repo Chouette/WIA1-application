@@ -92,6 +92,10 @@ int main(int argc, char** argv)
 	/* pour chaque dossier de thème */
 	for(i = 1 ; i < argc ; i++)
 	{
+		printf("\n\n\n") ;
+		printf("Thème %d sur %d : %s\n"
+			   "-----------------------\n", i, argc -1, argv[i]) ;
+
 		if(stat(argv[i], &st) == -1)
 		{
 			fprintf(stderr,"%s\n", argv[i]) ;
@@ -206,9 +210,12 @@ int main(int argc, char** argv)
 					motAStocker.occurences = 1 ;
 					motAStocker.freq_app = 1.0 / count ;
 					motAStocker.freq_thematique = 1.0 / (argc-1) ;
-					//printf("%s.freq_app = %f\n", motLu, motAStocker.freq_app) ;
+#if DEBUG
+					printf("%s.freq_thematique = %f\n", motLu, motAStocker.freq_thematique) ;
+#endif
 					update_score(&motAStocker) ;
 					motAStocker.dejaVu = j ;
+					motAStocker.inTheme = i ;
 #if VERBOSE
 					printf("Ajout de \"%s\" au dictionnaire\n", motLu) ;
 #endif
@@ -254,8 +261,14 @@ int main(int argc, char** argv)
 
 					if( motStocke.inTheme != i)
 					{
+#if DEBUG
+						printf("%s.inTheme = %d\n", motLu, motStocke.inTheme) ;
+#endif
 						motStocke.inTheme = i ;
 						motStocke.freq_thematique += 1.0 / (argc-1) ;
+#if DEBUG
+						printf("%s.inTheme = %d, freq_thematique = %.2f\n", motLu, motStocke.inTheme, motStocke.freq_thematique) ;
+#endif
 					}
 
 					update_score(&motStocke) ;
@@ -331,7 +344,7 @@ int main(int argc, char** argv)
 		printf("\t- ") ; print_mot(winners[i]) ; printf("\n") ;
 	}
 
-#if 1
+#if DEBUG
 	printf("\nObtenu à partir de la hash table suivante :\n") ;
 	print_dico(dico) ;
 #endif
