@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define VERBOSE 0
+#define DEBUG 0
 /*
  * Hashage par la méthode de la multiplication
  * @param cle : la clé à hasher
@@ -13,6 +15,9 @@ int hash(const char* cle)
 	int i = 0  ;
 	const double A = (sqrt(5) - 1) / 2 ;
 	double hashedValue = 0 ;
+
+	if(cle == NULL)
+		return -1 ;
 
 	for (i = 0 ; cle[i] != '\0' ; i++)
 	{
@@ -56,9 +61,29 @@ int contient(HashTable* dico, char* mot)
 	int index = 0 ;
 
 	if(mot == NULL)
+	{
+#if VERBOSE
+		printf("contient : mot vide\n") ;
+#endif
 		return 0 ;
+	}
 
-	index = hash(mot) ;
+	if(dico == NULL)
+	{
+#if VERBOSE
+		printf("contient : dico inexistant\n") ;
+#endif
+			return 0 ;
+	}
+
+	if((index = hash(mot)) == -1)
+	{
+#if VERBOSE
+		printf("contient : echec du hash de %s\n", mot) ;
+#endif
+		return 0 ;
+	}
+
 	return in_list(mot, dico->contenu[index]) ;
 }
 
@@ -70,13 +95,36 @@ int contient(HashTable* dico, char* mot)
  */
 HashTable* insere(Mot mot, HashTable* dico)
 {
-	int index ;
+	int index, contains ;
 
-	if(contient(dico, mot.mot))
+#if DEBUG
+	printf("insere :") ;
+#endif
+#if VERBOSE
+	printf("vérification du contenu du dictionnaire\n") ;
+#endif
+	contains = contient(dico, mot.mot) ;
+#if VERBOSE
+	printf("vérification terminée\n") ;
+#endif
+
+	if(contains)
+	{
+#if VERBOSE
+		printf("le dictionnaire contient deja %s. rien a faire\n", mot.mot) ;
+#endif
 		return dico ;
+	}
 
+
+#if VERBOSE
+	printf("hashage de %s\n", mot.mot) ;
+#endif
 	index = hash(mot.mot) ;
 
+#if VERBOSE
+	printf("ajout de %s à la page %d du dictionnaire\n", mot.mot, index) ;
+#endif
 	dico->contenu[index] = add(mot, dico->contenu[index]) ;
 
 	return dico ;

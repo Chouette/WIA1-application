@@ -1,6 +1,10 @@
 #include "liste.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
+
+#define VERBOSE 0
+#define DEBUG 0
 
 /*
  * Crée une liste de Mot par défaut
@@ -9,9 +13,26 @@
 ListeMots* init_listemots()
 {
 	ListeMots* liste ;
+
 	liste = malloc(sizeof(struct ListeMots)) ;
+
+	if(liste == NULL)
+	{
+		perror("init_listemots\n") ;
+		exit(errno) ;
+	}
+
+#if DEBUG
+	printf("init_listemots : initialisation de liste->element\n") ;
+#endif
 	liste->element = init_mot() ;
 	liste->suivant = NULL ;
+
+#if DEBUG
+	if(liste == NULL)
+		printf("init_listemots : something wrong happened\n") ;
+#endif
+
 
 	return liste ;
 }
@@ -55,15 +76,29 @@ void print_listemot(ListeMots* liste)
  */
 int in_list(char* mot, ListeMots* liste)
 {
-	ListeMots* tmp = init_listemots() ;
+	ListeMots* tmp ;
+
+#if DEBUG
+	printf("in_list : initialisation de tmp\n") ;
+#endif
+	tmp = init_listemots() ;
+
 	tmp = liste ;
 
+#if DEBUG
+	printf("in_list : début de la recherche\n") ;
+#endif
 	while(tmp->suivant != NULL)
 	{
 		if(strcmp(mot, (tmp->element).mot) == 0)
 			return 1 ;
+
 		tmp = tmp->suivant ;
 	}
+
+#if DEBUG
+	printf("in_list : mot non trouvé\n") ;
+#endif
 
 	return 0 ;
 }

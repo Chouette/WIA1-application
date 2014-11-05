@@ -9,11 +9,67 @@
 #include <dirent.h>
 
 #define NB_WINNERS 10
-#define DEBUG 1
+#define DEBUG 0
+#define VERBOSE 0
 
+/*
+ * Compte le nombre de fichiers réguliers d'un dossier
+ * @param path : le chemin vers le dossier
+ * @param dir : la structure représentant le dossier
+ * @return le nombre de fichiers réguliers présents dans le dossier
+ */
+int count_reg_files(char* path, DIR* dir)
+{
+	struct stat st ;
+	struct dirent* entite ;
+	int count = 0 ;
+	long pos ;
+	char* copie = malloc((strlen(path) + 1) * sizeof(char)) ;
+
+	if( copie == NULL)
+	{
+		perror("malloc") ;
+		exit(errno) ;
+	}
+
+	copie = strcpy( copie, path) ;
+
+	pos = telldir(dir) ;
+
+	while( (entite = readdir(dir)) != NULL)
+	{
+		path = strcat(path, "/") ;
+		path = strcat(path, entite->d_name) ;
+		
+		if( stat(path, &st) == -1)
+		{
+			perror(path) ;
+			exit(errno) ;
+		}
+
+		if( S_ISREG(st.st_mode) )
+			count++ ;
+		path = strcpy( path, copie) ;
+	}
+
+	
+	seekdir(dir, pos) ;
+	return count ;
+
+}
+
+/*
+ * Le programme génère une liste de mots supposés être représentatifs d'un
+ * thème donné. Pour cela il prend en argument une liste de dossiers (au moins
+ * 2),
+ * représentant chacun un thème. Le premier dossier est celui du thème que l'on
+ * considère. Les autres dossier servent à effectuer des comparaisons entre les
+ * thèmes
+ */
 int main(int argc, char** argv)
 {
 	int i = 0, minIndex = 0, nouveauxMots = 0, maj = 0, j = 1 ;
+	int count ;
 	FILE* fichierEnCours = NULL ;
 	DIR* repTheme = NULL ;
 	struct dirent* entite = NULL ;
@@ -34,8 +90,17 @@ int main(int argc, char** argv)
 		}
 
 		if(!S_ISDIR(st.st_mode))
+		{
+#if VERBOSE
+			printf("paramètre ignore : %s n'est pas un dossier\n", argv[i]) ;
+#endif
 			continue ;
+		}
 
+
+#if VERBOSE
+		printf("Ouverture du dossier %s\n", argv[i]) ;
+#endif
 		repTheme = opendir(argv[i]) ;
 
 		if(repTheme == NULL)
@@ -43,6 +108,8 @@ int main(int argc, char** argv)
 			perror("") ;
 			exit(errno) ;
 		}
+
+		count = count_reg_files(argv[i], repTheme) ;
 
 		for(entite = readdir(repTheme) ; entite != NULL ; entite = readdir(repTheme))
 		{
@@ -67,6 +134,25 @@ int main(int argc, char** argv)
 			path = strcat(path, argv[i]) ;
 			path = strcat(path, "/") ;
 			path = strcat(path, entite->d_name) ;
+
+			if(stat(path, &st) == -1)
+			{
+				perror(path) ;
+				continue ;
+			}
+
+			if(!S_ISREG(st.st_mode))
+			{
+#if VERBOSE
+				printf("element ignore : %s n'est pas un fichier regulier\n", path) ;
+#endif
+				continue ;
+			}
+
+#if VERBOSE
+			printf("Ouverture du fichier %s\n", entite->d_name) ;
+#endif
+
 			fichierEnCours = fopen(path, "r") ;
 
 			if(fichierEnCours == NULL)
@@ -77,8 +163,9 @@ int main(int argc, char** argv)
 			}
 
 			printf("***********************\n"
-				   "*Lecture du fichier %d*\n"
-				   "***********************\n",j++) ;
+				   "*Lecture du fichier %s*\n"
+				   "***********************\n", entite->d_name) ;
+			++j ;
 
 			motLu = to_lower(lire_mot(fichierEnCours, motLu)) ;	
 
@@ -92,28 +179,40 @@ int main(int argc, char** argv)
 				/* Si on a pas encore rencontré le mot */
 				if(!contient(dico, motLu))
 				{
+					Mot motAStocker = init_mot() ;
 					nouveauxMots++ ;
 #if DEBUG
 					printf("if(!contient(dico, motLu))\n{\n");
 #endif
-					Mot motAStocker = init_mot() ;
+
+#if VERBOSE
+					printf("le dictionnaire ne contient pas \"%s\"\n",motLu) ;
+#endif
 #if DEBUG
-					printf("motAStocker.mot = strcpy(motAStocker.mot, motLu) ;\n");
+					printf("motAStocker.mot = strcpy(motAStocker.mot, motLu)\n");
 #endif
 					motAStocker.mot = strcpy(motAStocker.mot, motLu) ;
 					motAStocker.occurences = 1 ;
-					motAStocker.freq_app = 1.0/(argc-1) ;
+					motAStocker.freq_app = 1.0/count ;
 					update_score(&motAStocker) ;
 					motAStocker.dejaVu = j ;
+#if VERBOSE
+					printf("Ajout de \"%s\" au dictionnaire\n", motLu) ;
+#endif
 					insere(motAStocker, dico) ;
+#if DEBUG
+					printf("\n") ;
+#endif
 				}
 				else
 				{
+					Mot motStocke ;
+
 					maj++ ;
 #if DEBUG
 					printf("else\n{//contient(dico,motLu)\n") ;
 #endif
-					Mot motStocke = get(motLu, dico) ;
+					motStocke = get(motLu, dico) ;
 #if DEBUG
 					printf("get terminé\n") ;
 #endif
@@ -125,13 +224,14 @@ int main(int argc, char** argv)
 						printf("if(motStocke.dejaVu != i)\n{\n") ;
 #endif
 						motStocke.dejaVu = j ;
-						motStocke.freq_app += 1.0 / (argc-1) ;
+						motStocke.freq_app += 1.0 / count ;
 					}
 
 					update_score(&motStocke) ;
 					set(motStocke, dico) ;
 #if DEBUG
 					printf("mot stocke mis à jour\n") ;
+					printf("\n") ;
 #endif
 				}
 
@@ -172,7 +272,7 @@ int main(int argc, char** argv)
 	{
 		ListeMots* liste = dico->contenu[i] ;
 		
-		printf("\tanalyse de la page %d du dictionnaire\n", i) ;
+//		printf("\tanalyse de la page %d du dictionnaire\n", i) ;
 		while (liste->suivant != NULL)
 		{
 			if(liste->element.score > winners[minIndex].score)
@@ -199,8 +299,10 @@ int main(int argc, char** argv)
 		printf("\t- ") ; print_mot(winners[i]) ; printf("\n") ;
 	}
 
+#if DEBUG
 	printf("\nObtenu à partir de la hash table suivante :\n") ;
 	print_dico(dico) ;
+#endif
 
 	printf("\n********************\n"
 		     "*generation du XML *\n"

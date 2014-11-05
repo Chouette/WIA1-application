@@ -1,7 +1,7 @@
 #ifndef FILES_H
 #define FILES_H
 
-#define NB_SEP 13
+#define NB_SEP 31
 
 #include <stdio.h>
 

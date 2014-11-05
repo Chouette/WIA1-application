@@ -6,7 +6,14 @@
 
 #define DEBUG 0
 
-const static char separateurs[NB_SEP] = {' ', '\t', '\n', ',', ';', '.', '?', '!', ':', '\'', '(', ')', EOF} ;
+const static char separateurs[NB_SEP] = {
+	'+'	,	'='		,	' '	,	'\t'	,	'\n', 
+	','	,	';'		,	'.'	,	'?'		,	'!', 
+	':'	, 	'\''	,	'('	,	')'		,	'/',
+	'\\',	EOF		,	'&'	,	'"'		,	'\'',
+	'#'	,	'{'		,	'['	,	'-'		,	'|',
+	'_'	,	'@'		,	']'	,	'}'		,	'<',
+	'>'} ;
 /*
  * Indique si un caractère est un séparateur de mots
  * @param c : le caractère à tester
