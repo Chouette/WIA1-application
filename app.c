@@ -190,39 +190,43 @@ int main(int argc, char** argv)
 				printf("while(motLu != NULL)\n{\n") ;
 #endif
 
-				/* Si on a pas encore rencontré le mot */
+				/* Si on a pas encore rencontré le mot on l'ajoute au
+				 * dictionnaire */
 				if(!contient(dico, motLu))
 				{
-					Mot motAStocker = init_mot() ;
+					if(i == 1)
+					{
+						Mot motAStocker = init_mot() ;
 
-					nouveauxMots++ ;
+						nouveauxMots++ ;
 #if DEBUG
-					printf("if(!contient(dico, motLu))\n{\n");
+						printf("if(!contient(dico, motLu))\n{\n");
 #endif
 
 #if VERBOSE
-					printf("le dictionnaire ne contient pas \"%s\"\n",motLu) ;
+						printf("le dictionnaire ne contient pas \"%s\"\n",motLu) ;
 #endif
 #if DEBUG
-					printf("motAStocker.mot = strcpy(motAStocker.mot, motLu)\n");
+						printf("motAStocker.mot = strcpy(motAStocker.mot, motLu)\n");
 #endif
-					motAStocker.mot = strcpy(motAStocker.mot, motLu) ;
-					motAStocker.occurences = 1 ;
-					motAStocker.freq_app = 1.0 / count ;
-					motAStocker.freq_thematique = 1.0 / (argc-1) ;
+						motAStocker.mot = strcpy(motAStocker.mot, motLu) ;
+						motAStocker.occurences = 1 ;
+						motAStocker.freq_app = 1.0 / count ;
+						motAStocker.freq_thematique = 1.0 / (argc-1) ;
 #if DEBUG
-					printf("%s.freq_thematique = %f\n", motLu, motAStocker.freq_thematique) ;
+						printf("%s.freq_thematique = %f\n", motLu, motAStocker.freq_thematique) ;
 #endif
-					update_score(&motAStocker) ;
-					motAStocker.dejaVu = j ;
-					motAStocker.inTheme = i ;
+						update_score(&motAStocker) ;
+						motAStocker.dejaVu = j ;
+						motAStocker.inTheme = i ;
 #if VERBOSE
-					printf("Ajout de \"%s\" au dictionnaire\n", motLu) ;
+						printf("Ajout de \"%s\" au dictionnaire\n", motLu) ;
 #endif
-					insere(motAStocker, dico) ;
+						insere(motAStocker, dico) ;
 #if DEBUG
-					printf("\n") ;
+						printf("\n") ;
 #endif
+					}
 				}
 				else
 				{
@@ -236,7 +240,8 @@ int main(int argc, char** argv)
 #if DEBUG
 					printf("get terminé\n") ;
 #endif
-					motStocke.occurences++ ;
+					if(i == 1)
+						motStocke.occurences++ ;
 
 					/*
 					 * si on a pas encore rencontré le mot dans le texte
@@ -248,11 +253,6 @@ int main(int argc, char** argv)
 #endif
 						motStocke.dejaVu = j ;
 
-						/* 
-						 * freq_app est la fréquence d'apparition du mot
-						 * vis-à-vis du thème qu'on considère, soit celui de
-						 * argv[1]. D'où le test 
-						 */
 						if(i == 1)
 							motStocke.freq_app += 1.0 / count ;
 
@@ -341,10 +341,13 @@ int main(int argc, char** argv)
 		     "*************\n");
 	for(i = 0 ; i < NB_WINNERS ; i++)
 	{
-		printf("\t- ") ; print_mot(winners[i]) ; printf("\n") ;
+		if(winners[i].mot[0] != '\0')
+		{
+			printf("\t- ") ; print_mot(winners[i]) ; printf("\n") ;
+		}
 	}
 
-#if DEBUG
+#if 1
 	printf("\nObtenu à partir de la hash table suivante :\n") ;
 	print_dico(dico) ;
 #endif

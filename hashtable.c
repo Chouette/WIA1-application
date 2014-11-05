@@ -163,7 +163,10 @@ void print_dico(HashTable* dico)
 
 	for(i = 0 ; i < dico->taille ; i++)
 	{
-		printf("entrée %d : ", i) ; print_listemot(dico->contenu[i]) ; printf("\n") ;
+		if(dico->contenu[i]->element.mot[0] != '\0')
+		{
+			printf("entrée %d : ", i) ; print_listemot(dico->contenu[i]) ; printf("\n") ;
+		}
 	}
 }
 

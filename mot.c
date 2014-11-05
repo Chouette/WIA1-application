@@ -34,8 +34,10 @@ Mot init_mot()
 		perror("init_mot") ;
 		exit(errno) ;
 	}
+	mot.mot[0] = '\0' ;
 
-	mot.freq_app = mot.occurences = mot.score = mot.dejaVu = mot.freq_thematique = mot.inTheme = 0  ;
+	mot.freq_app = mot.occurences = mot.dejaVu = mot.freq_thematique = mot.inTheme = 0  ;
+	mot.score = 0 ;
 #if VERBOSE
 	printf("init_mot : mot créé :") ;
 	print_mot(mot) ;
