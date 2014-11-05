@@ -10,7 +10,7 @@
 
 #define NB_WINNERS 10
 #define DEBUG 0
-#define VERBOSE 1
+#define VERBOSE 0
 
 int nb_winners = 10 ;
 char* output_file = NULL ;
@@ -150,7 +150,7 @@ int parse_options(const int argc, char** argv)
 int main(int argc, char** argv)
 {
 	int i = 0, minIndex = 0, nouveauxMots = 0, maj = 0, j = 1 ;
-	int count = 0, start ;
+	int count = 0, start, singleMode = 0 ;
 	FILE* fichierEnCours = NULL ;
 	DIR* repTheme = NULL ;
 	struct dirent* entite = NULL ;
@@ -158,7 +158,18 @@ int main(int argc, char** argv)
 	HashTable* dico = NULL ;
 	Mot *winners ;
 
+	if(argc <= 1)
+	{
+		printf("Syntaxe :\nappli -h\n"
+		       "appli [-n nb_winners] <dossier_theme> [dossier_theme...]\n") ;
+		return 1 ;
+	}
+
 	start = parse_options(argc, argv) ;
+	if(argc - start == 2)
+	{
+		singleMode = 1 ;
+	}
 	winners = calloc(nb_winners, sizeof(Mot)) ;
 
 	if(winners == NULL)
@@ -178,7 +189,7 @@ int main(int argc, char** argv)
 	{
 		printf("\n\n\n") ;
 		printf("Thème %d sur %d : %s\n"
-			   "-----------------------\n", i - start, argc -1, argv[i]) ;
+			   "-----------------------\n", i - start, argc - start - 1, argv[i]) ;
 
 		if(stat(argv[i], &st) == -1)
 		{
@@ -296,11 +307,11 @@ int main(int argc, char** argv)
 						motAStocker.mot = strcpy(motAStocker.mot, motLu) ;
 						motAStocker.occurences = 1 ;
 						motAStocker.freq_app = 1.0 / count ;
-						motAStocker.freq_thematique = 1.0 / (argc-1) ;
+						motAStocker.freq_thematique = 1.0 / (argc - start - 1) ;
 #if DEBUG
 						printf("%s.freq_thematique = %f\n", motLu, motAStocker.freq_thematique) ;
 #endif
-						update_score(&motAStocker) ;
+						update_score(&motAStocker, singleMode) ;
 						motAStocker.dejaVu = j ;
 						motAStocker.inTheme = i ;
 #if VERBOSE
@@ -349,13 +360,13 @@ int main(int argc, char** argv)
 						printf("%s.inTheme = %d\n", motLu, motStocke.inTheme) ;
 #endif
 						motStocke.inTheme = i ;
-						motStocke.freq_thematique += 1.0 / (argc-1) ;
+						motStocke.freq_thematique += 1.0 / (argc - start -1) ;
 #if DEBUG
 						printf("%s.inTheme = %d, freq_thematique = %.2f\n", motLu, motStocke.inTheme, motStocke.freq_thematique) ;
 #endif
 					}
 
-					update_score(&motStocke) ;
+					update_score(&motStocke, singleMode) ;
 					set(motStocke, dico) ;
 #if DEBUG
 					printf("mot stocke mis à jour\n") ;

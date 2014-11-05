@@ -17,7 +17,7 @@ struct Mot
 
 void print_mot(Mot mot) ;
 Mot init_mot() ;
-void update_score(Mot* mot) ;
+void update_score(Mot* mot, int single_mode) ;
 Mot copie_mot(Mot* dest, const Mot* src) ;
 
 #endif

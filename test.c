@@ -92,7 +92,7 @@ int main(int argc, char** argv)
 	printf("\n") ;
 	word.freq_app+=3 ;
 	word.occurences+=2 ;
-	update_score(&word) ;
+	update_score(&word, 1) ;
 	print_mot(word) ;
 	printf("\n\n\n") ;
 
@@ -107,7 +107,7 @@ int main(int argc, char** argv)
 	word.mot = strcpy(word.mot, lire_mot(fileTest, word.mot)) ;
 	word.freq_app = 3 ;
 	word.occurences = 2 ;
-	update_score(&word) ;
+	update_score(&word, 1) ;
 	liste = add(word, liste) ;
 	print_listemot(liste) ;
 	printf("\n\n") ;
@@ -115,7 +115,7 @@ int main(int argc, char** argv)
 	word.mot = strcpy(word.mot, lire_mot(fileTest, word.mot)) ;
 	word.freq_app = 6 ;
 	word.occurences = 4 ;
-	update_score(&word) ;
+	update_score(&word, 1) ;
 	liste = add(word, liste) ;
 	print_listemot(liste) ;
 	printf("\n\n") ;
@@ -123,7 +123,7 @@ int main(int argc, char** argv)
 	word.mot = strcpy(word.mot, lire_mot(fileTest, word.mot)) ;
 	word.freq_app = 12 ;
 	word.occurences = 8 ;
-	update_score(&word) ;
+	update_score(&word, 1) ;
 	liste = add(word, liste) ;
 	print_listemot(liste) ;
 	printf("\n\n\n") ;
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
 	word.mot = strcpy(word.mot, lire_mot(fileTest, word.mot)) ;
 	word.freq_app = 1 ;
 	word.occurences = 2 ;
-	update_score(&word) ;
+	update_score(&word, 1) ;
 	dico = insere(word, dico) ;
 	print_dico(dico) ;
 	printf("\n\n") ;
@@ -144,7 +144,7 @@ int main(int argc, char** argv)
 	word.mot = strcpy(word.mot, lire_mot(fileTest, word.mot)) ;
 	word.freq_app = 3 ;
 	word.occurences = 5 ;
-	update_score(&word) ;
+	update_score(&word, 1) ;
 	dico = insere(word, dico) ;
 	print_dico(dico) ;
 	printf("\n\n") ;
@@ -152,7 +152,7 @@ int main(int argc, char** argv)
 	word.mot = strcpy(word.mot, lire_mot(fileTest, word.mot)) ;
 	word.freq_app = 8 ;
 	word.occurences = 13 ;
-	update_score(&word) ;
+	update_score(&word, 1) ;
 	dico = insere(word, dico) ;
 	print_dico(dico) ;
 	if(contient(dico,"trololo"))

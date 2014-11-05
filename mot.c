@@ -50,9 +50,12 @@ Mot init_mot()
  * Met à jour le score du mot
  * @param mot : le mot dont on souhaite mettre le score à jour
  */
-void update_score (Mot* mot)
+void update_score (Mot* mot, int singleMode)
 {
-	mot->score = -log(mot->freq_thematique) * mot->freq_app * mot->occurences ;
+	if(!singleMode)
+		mot->score = -log(mot->freq_thematique) * mot->freq_app * mot->occurences ;
+	else
+		mot->score = mot->freq_app * mot->occurences ;
 }
 
 /*
